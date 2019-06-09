@@ -114,6 +114,8 @@
       const root = document.querySelector('#root');
       const db = new DB('users');
       
+      const Home = () => <div id='home'><h2>Welcome to the ACME User Manager</h2></div>
+
       const Nav = ({ users }) => {
           const numAdmins = users.reduce(function(acc, user){
               if(user.admin){
@@ -167,6 +169,7 @@
           return(
               <HashRouter>
                 <Route path='/' render={() => <Nav users={ users } />} />
+                <Route path='/home' component={ Home } />
                 <Route path='/users' render={() => <Users users={ users } />} />
               </HashRouter>
           );
