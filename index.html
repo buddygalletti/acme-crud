@@ -1,6 +1,9 @@
 <html>
   <head>
 <style>
+    a {
+        padding-right: 20px;
+    }
 </style>
     <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
     <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
@@ -95,21 +98,41 @@
   <body>
     <div id='root'></div>
     <script type='text/babel'>
+      const { HashRouter, Route, Link, NavLink } = ReactRouterDOM;
       const root = document.querySelector('#root');
       const db = new DB('users');
+      
+      const Nav = ({ users, admins }) => {
+          return (
+              <div id='nav'>
+                <Link to='/home'>Home</Link>
+                <Link to='/users'>Users: ({ users.length }) Admins: ({ admins.length })</Link>
+              </div>
+          )
+      }
+      
+      
+      
       class App extends React.Component{
         constructor(){
           super();
           this.state = {
-            users: 0
+            users: ['buddy', 'hannah', 'john'],
+            admins: ['buddy']
           }
         }
+
         componentDidMount(){
-          db.read()
-            .then(users => this.setState({ users }))
+        //   db.read()
+        //     .then(users => this.setState({ users }))
         }
         render(){
-          return( <div>{this.state.users.length}</div>
+          const { users, admins } = this.state;
+          const { totalNumUsers } = this;
+          return(
+              <HashRouter>
+                <Route path='/' render={() => <Nav users={ users } admins={ admins } />} />
+              </HashRouter>
           );
         }
       }
