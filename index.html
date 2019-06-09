@@ -16,6 +16,11 @@
     .admin > a {
         color: white;
     }
+    form {
+        background-color: rgb(239, 239, 239);
+        border-radius: 15px;
+        padding: 1em;
+    }
 </style>
     <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
     <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
@@ -131,18 +136,29 @@
           )
       }
       
-      const Users = ({ users }) => {
+      const Users = ({ users, handleChange }) => {
         return (
-            <div className='users'>
-                {
-                    users.map(user => {
-                        return (
-                            <div key={user.id} className={user.admin ? 'admin' : ''}>
-                                <Link to={`/users/${user.id}`}>{user.name}</Link>
-                            </div>
-                        )
-                    })
-                }       
+            <div>
+                <h2>Users</h2>
+                <form>
+                    <h3>Create A User</h3>
+                    <fieldset>
+                        <input placeholder='enter name' type='text' value={this.state.users.name || ''} name='name' onChange={handleChange} /><br />
+                        Is Admin? <input type='checkbox' name='admin' value='admin'/><br />
+                        <button type = "submit" >Create</button>
+                    </fieldset>
+                </form>
+                <div className='users'>
+                    {
+                        users.map(user => {
+                            return (
+                                <div key={user.id} className={user.admin ? 'admin' : ''}>
+                                    <Link to={`/users/${user.id}`}>{user.name}</Link>
+                                </div>
+                            )
+                        })
+                    }       
+                </div>
             </div>
         )
       }
@@ -157,7 +173,15 @@
                 {name: 'sam', id: 3, admin: false}
             ],
           }
+          this.handleChange = this.handleChange.bind(this);
         }
+
+        handleChange = (event) => {
+                this.setState({
+                    [event.target.name]: event.target.value
+                });
+                console.log(this.state);
+            }
 
         componentDidMount(){
         //   db.read()
@@ -165,12 +189,12 @@
         }
         render(){
           const { users, admins } = this.state;
-          const { totalNumUsers } = this;
+          const { handleChange } = this;
           return(
               <HashRouter>
                 <Route path='/' render={() => <Nav users={ users } />} />
                 <Route path='/home' component={ Home } />
-                <Route path='/users' render={() => <Users users={ users } />} />
+                <Route path='/users' render={() => <Users users={ users } handleChange={ handleChange } />} />
               </HashRouter>
           );
         }
