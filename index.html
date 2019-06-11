@@ -129,25 +129,37 @@
               return acc;
           }, 0)
           return (
-              <div id='nav'>
-                <Link to='/home'>Home</Link>
-                <Link to='/users'>Users: ({ users.length }) Admins: ({ numAdmins })</Link>
+              <div>
+                <div id='header'><h1>ACME Users CRUD</h1></div>
+                <div id='nav'>
+                  <Link to='/home'>Home</Link>
+                  <Link to='/users'>Users: ({ users.length }) Admins: ({ numAdmins })</Link>
+                </div>
               </div>
           )
       }
       
-      const Users = ({ users, handleChange }) => {
+      const CreateUser = ({ users, handleChange }) => {
+        return (
+          <form>
+            <h3>Create A User</h3>
+            <fieldset>
+                <input placeholder='enter name' type='text' name='name' onChange={handleChange} /><br />
+                Is Admin? <input type='checkbox' name='admin' value='admin'/><br />
+                <button type = "submit" >Create</button>
+            </fieldset>
+          </form>
+        )
+      }
+      
+      
+      const Users = (props) => {
+        const { users, handleChange, match, handleSubmit } = props;
+        const idx = match.params.idx ? match.params.idx * 1 : 0;
         return (
             <div>
                 <h2>Users</h2>
-                <form>
-                    <h3>Create A User</h3>
-                    <fieldset>
-                        <input placeholder='enter name' type='text' value={} name='name' onChange={handleChange} /><br />
-                        Is Admin? <input type='checkbox' name='admin' value='admin'/><br />
-                        <button type = "submit" >Create</button>
-                    </fieldset>
-                </form>
+                <CreateUser users={ users } handleChange={ handleChange } />
                 <div className='users'>
                     {
                         users.map(user => {
@@ -159,7 +171,30 @@
                         })
                     }       
                 </div>
+                <div id='create'>
+                  {
+                    users.map(user => {
+                      if(user.id === idx){
+                        return <UpdateUser key={user.id} history={history} location={location} users={ users } user={ user } handleChange={ handleChange } handleSubmit={ handleSubmit }/>
+                      }
+                    })
+                  }
+                </div>
             </div>
+        )
+      }
+
+      const UpdateUser = ({ users, handleChange, user }) => {
+        return (
+          <form>
+              <h3>Update A User</h3>
+              <fieldset>
+                  <input type='text' value={user.name} name='name' onChange={handleChange} /><br />
+                  Is Admin? <input type='checkbox' name='admin' value='admin' checked={user.admin ? 'checked' : ''}/><br />
+                  <button type = "submit">Create</button><br />
+                  <button type = "clear">Delete</button>
+              </fieldset>
+          </form>
         )
       }
       
@@ -176,11 +211,21 @@
           this.handleChange = this.handleChange.bind(this);
         }
 
+        handleSubmit = (userName, checked) => {
+          const user = {
+            name: userName,
+            id: Math.random().toString().slice(2),
+            checked: checked
+          }
+          this.setState(oldState => ({
+            users: [...oldState.users, user]
+          }))
+        }
+
         handleChange = (event) => {
                 this.setState({
                     [event.target.name]: event.target.value
                 });
-                console.log(this.state);
             }
 
         componentDidMount(){
@@ -189,12 +234,12 @@
         }
         render(){
           const { users, admins } = this.state;
-          const { handleChange } = this;
+          const { handleChange, handleSubmit } = this;
           return(
               <HashRouter>
                 <Route path='/' render={() => <Nav users={ users } />} />
                 <Route path='/home' component={ Home } />
-                <Route path='/users' render={() => <Users users={ users } handleChange={ handleChange } />} />
+                <Route path='/users/:idx?' render={({history, location, match}) => <Users history={history} location={location} match={match} users={ users } handleChange={ handleChange } handleSubmit={ handleSubmit } />} />
               </HashRouter>
           );
         }
